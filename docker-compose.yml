@@ -1,0 +1,25 @@
+services:
+  api:
+    build:
+      dockerfile: ./Dockerfile
+      target: local
+    ports:
+      - "8000:8000"
+    # depends_on:
+    #   - db
+    volumes:
+      - .:/home/rust
+    working_dir: /home/rust
+    environment:
+      - USER=user
+      - DATABASE_URL=postgres://local_user:local_pass@db:5432/webapi_mvp
+    tty: true
+  db:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: "webapi_mvp"
+      POSTGRES_USER: "local_user"
+      POSTGRES_PASSWORD: "local_pass"
+    restart: always
