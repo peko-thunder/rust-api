@@ -18,17 +18,16 @@ async fn get_technologiy_page(tech_name: web::Path<String>) -> impl Responder {
     // DBへアクセスして技術ページに表示する情報を取得する
     let conn = db::connection::create();
     let path = tech_name.to_string();
-    let (tech, projs) = 
-        db::interface::get_technology_page_by_url_name(&conn, &path)
-            .expect("NotFound");
+    let (tech, projs) = match db::interface::get_technology_page_by_url_name(&conn, &path) {
+        Ok(result) => result,
+        Err(_) => return HttpResponse::NotFound().finish()
+    };
 
     //HTML形式のレスポンスボディを生成する
-    let contents = render_technology_page(tech, projs)
-        .expect("InternalServerError");
-
-    HttpResponse::Ok()
-        .content_type("text/html")
-        .body(contents) // HTMLコンテンツを返す
+    match render_technology_page(tech, projs) {
+        Ok(contents) => HttpResponse::Ok().content_type("text/html").body(contents),
+        Err(_) => HttpResponse::InternalServerError().finish()
+    }
 }
 
 fn render_technology_page(
