@@ -1,3 +1,7 @@
+## Access
+
+http://localhost:8000/technologies/aws
+
 ## Command
 
 ### docker image
